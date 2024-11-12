@@ -17,8 +17,7 @@ on:
       - "calm/pattern/**"
       - "calm/samples/**"
       - "spectral/**" 
-      
-  workflow_dispatch:
+  # workflow_dispatch:
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
   SonatypeAppId: "aac-spectral"
@@ -41,7 +40,7 @@ jobs:
       - run: npx spectral lint --ruleset spectral/instantiation/validation-rules.yaml 'calm/samples/api-gateway-instantiation(*.json|*.yaml)'
 
       - name: Sonatype Lifecycle SCA Scan
-        # if: github.repository_owner == 'finos'
+        if: github.repository_owner == 'finos'
         id: evaluate
         uses: sonatype/actions/evaluate@v1
         with:
@@ -54,7 +53,7 @@ jobs:
           module-exclude: ${{ env.ExcludeDirectory }}
   
       - name: Save Sonatype SBOM
-        # if: github.repository_owner == 'finos' && steps.evaluate.outputs.scan-id && always() 
+        if: github.repository_owner == 'finos' && steps.evaluate.outputs.scan-id && always() 
         uses: sonatype/actions/fetch-sbom@v1
         with:
           iq-server-url: ${{ env.SonatypeUrl }}
