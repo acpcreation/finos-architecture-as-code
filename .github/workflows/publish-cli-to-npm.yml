@@ -20,7 +20,7 @@ jobs:
       run:
         working-directory: ./cli
     steps:
-    #   - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
     #     with:
     #       token: ${{ secrets.GITHUB_TOKEN }}
     #   - run: git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
