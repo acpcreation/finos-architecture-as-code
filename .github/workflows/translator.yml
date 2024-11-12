@@ -58,4 +58,7 @@ jobs:
         password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
         application-id: ${{ env.SonatypeAppId }}
         scan-id: ${{ steps.evaluate.outputs.scan-id }}
+        sbom-standard: spdx
+        sbom-version: 2.3
+        artifact-name: ${{ env.SonatypeAppId }}-sonatype-bom
 
