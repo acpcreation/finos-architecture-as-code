@@ -7,12 +7,17 @@ on:
   pull_request:
     branches: [ "main" ]
     paths: [ "translator/**" ]
+  workflow_dispatch:
+
+env:
+  SonatypeUrl: "https://finos.sonatype.app/platform/"
+  SonatypeAppId: "aac-translator"
+  SonatypeScanTarget: "translator/"
+  ExcludeDirectory: ""
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-java@v4
@@ -29,4 +34,28 @@ jobs:
     #     token: ${{ secrets.GITHUB_TOKEN }}
     #     min-coverage-overall: 80
     #     min-coverage-changed-files: 80
+
+    - name: Sonatype Lifecycle SCA Scan
+    # if: github.repository_owner == 'finos'
+      id: evaluate
+      uses: sonatype/actions/evaluate@v1
+      with:
+        iq-server-url: ${{ env.SonatypeUrl }}
+        username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+        password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+        application-id: ${{ env.SonatypeAppId }}
+        stage: "build"
+        scan-targets: ${{ env.SonatypeScanTarget }}
+        module-exclude: ${{ env.ExcludeDirectory }}
+
+    - name: Save Sonatype SBOM
+    # if: github.repository_owner == 'finos'
+      uses: sonatype/actions/fetch-sbom@v1
+      if: always() && steps.evaluate.outputs.scan-id
+      with:
+        iq-server-url: ${{ env.SonatypeUrl }}
+        username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+        password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+        application-id: ${{ env.SonatypeAppId }}
+        scan-id: ${{ steps.evaluate.outputs.scan-id }}
 
