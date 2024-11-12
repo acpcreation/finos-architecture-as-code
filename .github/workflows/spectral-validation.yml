@@ -17,7 +17,14 @@ on:
       - "calm/pattern/**"
       - "calm/samples/**"
       - "spectral/**" 
-
+      
+  workflow_dispatch:
+env:
+  SonatypeUrl: "https://finos.sonatype.app/platform/"
+  SonatypeAppId: "aac-spectral"
+  SonatypeScanTarget: "calm/ spectral/"
+  ExcludeDirectory: ""
+  
 jobs:
   spectrals:
     name: Run Spectral
@@ -33,3 +40,28 @@ jobs:
       - run: npm install @stoplight/spectral-cli
       - run: npx spectral lint --ruleset spectral/instantiation/validation-rules.yaml 'calm/samples/api-gateway-instantiation(*.json|*.yaml)'
 
+      - name: Sonatype Lifecycle SCA Scan
+        # if: github.repository_owner == 'finos'
+        id: evaluate
+        uses: sonatype/actions/evaluate@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}
+          stage: "build"
+          scan-targets: ${{ env.SonatypeScanTarget }}
+          module-exclude: ${{ env.ExcludeDirectory }}
+  
+      - name: Save Sonatype SBOM
+        # if: github.repository_owner == 'finos' && steps.evaluate.outputs.scan-id && always() 
+        uses: sonatype/actions/fetch-sbom@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}
+          scan-id: ${{ steps.evaluate.outputs.scan-id }}
+          sbom-standard: spdx
+          sbom-version: 2.3
+          artifact-name: ${{ env.SonatypeAppId }}-sonatype-bom
