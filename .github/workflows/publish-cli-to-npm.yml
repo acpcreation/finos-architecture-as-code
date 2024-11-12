@@ -5,6 +5,12 @@ on:
     types: [published]
   workflow_dispatch:
 
+env:
+  SonatypeUrl: "https://finos.sonatype.app/platform/"
+  SonatypeAppId: "aac-npm"
+  SonatypeScanTarget: "."
+  ExcludeDirectory: ""
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,3 +40,30 @@ jobs:
       - run: npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Sonatype Lifecycle SCA Scan
+      # if: github.repository_owner == 'finos'
+        id: evaluate
+        uses: sonatype/actions/evaluate@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}
+          stage: "build"
+          scan-targets: ${{ env.SonatypeScanTarget }}
+          module-exclude: ${{ env.ExcludeDirectory }}
+  
+      - name: Save Sonatype SBOM
+      # if: github.repository_owner == 'finos'
+        uses: sonatype/actions/fetch-sbom@v1
+        if: always() && steps.evaluate.outputs.scan-id
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}
+          scan-id: ${{ steps.evaluate.outputs.scan-id }}
+          sbom-standard: spdx
+          sbom-version: 2.3
+          artifact-name: ${{ env.SonatypeAppId }}-sonatype-bom
