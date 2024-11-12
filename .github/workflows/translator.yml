@@ -36,7 +36,7 @@ jobs:
     #     min-coverage-changed-files: 80
 
     - name: Sonatype Lifecycle SCA Scan
-    # if: github.repository_owner == 'finos'
+      if: github.repository_owner == 'finos'
       id: evaluate
       uses: sonatype/actions/evaluate@v1
       with:
@@ -49,9 +49,8 @@ jobs:
         module-exclude: ${{ env.ExcludeDirectory }}
 
     - name: Save Sonatype SBOM
-    # if: github.repository_owner == 'finos'
+      if: github.repository_owner == 'finos' && steps.evaluate.outputs.scan-id && always() 
       uses: sonatype/actions/fetch-sbom@v1
-      if: always() && steps.evaluate.outputs.scan-id
       with:
         iq-server-url: ${{ env.SonatypeUrl }}
         username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
