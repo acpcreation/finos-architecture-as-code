@@ -8,7 +8,7 @@ on:
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
   SonatypeAppId: "aac-npm"
-  SonatypeScanTarget: "**/package.json **/package-lock.json"
+  SonatypeScanTarget: "**/package.json **/package-lock.json **/*.js **/*.jar"
   ExcludeDirectory: ""
 
 jobs:
