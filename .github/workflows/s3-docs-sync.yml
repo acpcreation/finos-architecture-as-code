@@ -1,7 +1,7 @@
 name: Sync Docs to S3
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch: 
   push:
     branches: [ "main" ]
     paths: [ "docs/**" ]
@@ -9,7 +9,7 @@ on:
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
   SonatypeAppId: "aac-s3-docs"
-  SonatypeScanTarget: "docs/"
+  SonatypeScanTarget: "."
   ExcludeDirectory: ""
 
 jobs:
