@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # use 'if' to prevent endless looping with npm package commit
-    # if: "!startsWith(github.event.head_commit.message, '[RELEASE]')"
+    if: "!startsWith(github.event.head_commit.message, '[RELEASE]')"
     defaults:
       run:
         working-directory: ./cli
