@@ -1,0 +1,84 @@
+name: Sonatype CVE and License Scanning for Node.js and Maven
+
+on:
+  workflow_dispatch:
+  pull_request_target:
+
+env:
+  SonatypeUrl: "https://finos.sonatype.app/platform/"
+  SonatypeAppId: "architecture-as-code"
+  SonatypeScanTarget: "translator/ cli/ docs/"
+  ExcludeDirectory: ""
+
+jobs:
+  npm-build:
+    name: ${{ matrix.npm-module-folder }}-node-build
+    runs-on: ubuntu-latest
+    # continue-on-error: false
+    strategy:
+      matrix:
+        npm-module-folder: ['cli', 'docs']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build project with NPM
+        run: npm install --omit=dev
+        working-directory: ${{ matrix.npm-module-folder }}
+
+  maven-build:
+    name: maven-build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [ '21' ]
+        maven-module-folder: ['translator']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          cache: maven
+          distribution: 'adopt'
+      - name: Build with Maven
+        run: mvn clean install -Dmaven.test.skip=true
+        working-directory: ${{ matrix.maven-module-folder }}
+
+  sonatype-scan:
+    name: sonatype-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sonatype Lifecycle SCA Scan
+        # if: github.repository_owner == 'finos'
+        id: evaluate
+        uses: sonatype/actions/evaluate@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}
+          stage: "build"
+          scan-targets: ${{ env.SonatypeScanTarget }}
+          module-exclude: ${{ env.ExcludeDirectory }}
+  
+      - name: Save Sonatype SBOM
+        if: steps.evaluate.outputs.scan-id && always() 
+        uses: sonatype/actions/fetch-sbom@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}
+          scan-id: ${{ steps.evaluate.outputs.scan-id }}
+          sbom-standard: spdx
+          sbom-version: 2.3
+          artifact-name: ${{ env.SonatypeAppId }}-sonatype-bom
+
+
+
+    
