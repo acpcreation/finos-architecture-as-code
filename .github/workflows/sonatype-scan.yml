@@ -11,16 +11,18 @@ env:
   ExcludeDirectory: ""
 
 jobs:
-  npm-build:
-    name: ${{ matrix.npm-module-folder }}-node-build
+  build:
+    name: Build and Scan Apps
     runs-on: ubuntu-latest
-    # continue-on-error: false
     strategy:
       matrix:
         npm-module-folder: ['cli', 'docs']
+        java-version: [ '21' ]
+        maven-module-folder: ['translator']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -28,22 +30,7 @@ jobs:
       - name: Build project with NPM
         run: npm install --omit=dev
         working-directory: ${{ matrix.npm-module-folder }}
-      - name: Cache data
-        uses: actions/cache@v3
-        with:
-          path: ${{ matrix.npm-module-folder }}
-          key: dependencies
 
-  maven-build:
-    name: maven-build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java-version: [ '21' ]
-        maven-module-folder: ['translator']
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -53,32 +40,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean install -Dmaven.test.skip=true
         working-directory: ${{ matrix.maven-module-folder }}
-      - name: Cache data
-        uses: actions/cache@v3
-        with:
-          path: ${{ matrix.maven-module-folder }}
-          key: dependencies
-
-  sonatype-scan:
-    name: sonatype-scan
-    needs: [maven-build, npm-build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Restore cache
-        uses: actions/cache@v3
-        with:
-          path: .   # Path where the cached data will be restored
-          key: dependencies
-          restore-keys: |
-            dependencies
-
-      - name: TEMP
-        run: |
-          ls
-          ls translator/
         
       - name: Sonatype Lifecycle SCA Scan
         # if: github.repository_owner == 'finos'
