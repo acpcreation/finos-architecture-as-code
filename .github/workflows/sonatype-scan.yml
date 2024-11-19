@@ -54,6 +54,12 @@ jobs:
     needs: [maven-build, npm-build]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: TEMP
+        run: ls
+        
       - name: Sonatype Lifecycle SCA Scan
         # if: github.repository_owner == 'finos'
         id: evaluate
