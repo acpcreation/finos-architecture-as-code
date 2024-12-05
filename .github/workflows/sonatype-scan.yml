@@ -14,8 +14,8 @@ jobs:
   build:
     name: Build and Scan Apps
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
+    # strategy:
+    #   matrix:
         # npm-module-folder: ['cli', 'docs']
         # java-version: [ '21' ]
         # maven-module-folder: ['translator']
