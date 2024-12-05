@@ -1,4 +1,4 @@
-name: Sonatype CVE and License Scanning for Node.js and Maven
+name: Sonatype SCA Scanning for Node.js and Maven
 
 on:
   workflow_dispatch:
@@ -14,11 +14,6 @@ jobs:
   build:
     name: Build and Scan Apps
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-        # npm-module-folder: ['cli', 'docs']
-        # java-version: [ '21' ]
-        # maven-module-folder: ['translator']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,8 +26,8 @@ jobs:
         run: |
           cd cli/
           npm install --omit=dev
-          # cd ../docs/
-          # npm install --omit=dev
+          cd ../docs/
+          npm install --omit=dev
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -41,8 +36,9 @@ jobs:
           cache: maven
           distribution: 'adopt'
       - name: Build with Maven
-        run: mvn clean install -Dmaven.test.skip=true
-        working-directory: translator
+        run: |
+          cd translator/
+          mvn clean install -Dmaven.test.skip=true
         
       - name: Sonatype Lifecycle SCA Scan
         # if: github.repository_owner == 'finos'
