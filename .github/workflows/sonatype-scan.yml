@@ -17,8 +17,8 @@ jobs:
     strategy:
       matrix:
         # npm-module-folder: ['cli', 'docs']
-        java-version: [ '21' ]
-        maven-module-folder: ['translator']
+        # java-version: [ '21' ]
+        # maven-module-folder: ['translator']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,23 +27,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Build CLI project with NPM
-        run: npm install --omit=dev
-        working-directory: 'cli'
-
-      - name: Build Docs project with NPM
-        run: npm install --omit=dev
-        working-directory: 'docs'
+      - name: Build projects with NPM
+        run: |
+          cd cli/
+          npm install --omit=dev
+          cd ../docs/
+          npm install --omit=dev
 
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java-version }}
+          java-version: 21
           cache: maven
           distribution: 'adopt'
       - name: Build with Maven
         run: mvn clean install -Dmaven.test.skip=true
-        working-directory: ${{ matrix.maven-module-folder }}
+        working-directory: translator
         
       - name: Sonatype Lifecycle SCA Scan
         # if: github.repository_owner == 'finos'
