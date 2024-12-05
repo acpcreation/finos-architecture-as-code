@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        npm-module-folder: ['cli', 'docs']
+        # npm-module-folder: ['cli', 'docs']
         java-version: [ '21' ]
         maven-module-folder: ['translator']
     steps:
@@ -27,9 +27,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Build project with NPM
+      - name: Build CLI project with NPM
         run: npm install --omit=dev
-        working-directory: ${{ matrix.npm-module-folder }}
+        working-directory: 'cli'
+
+      - name: Build Docs project with NPM
+        run: npm install --omit=dev
+        working-directory: 'docs'
 
       - name: Setup JDK
         uses: actions/setup-java@v4
