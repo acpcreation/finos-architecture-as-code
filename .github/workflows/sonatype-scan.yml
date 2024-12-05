@@ -7,7 +7,7 @@ on:
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
   SonatypeAppId: "architecture-as-code"
-  SonatypeScanTarget: "translator/ cli/ docs/"
+  SonatypeScanTarget: "-X translator/ cli/ docs/"
   ExcludeDirectory: ""
 
 jobs:
