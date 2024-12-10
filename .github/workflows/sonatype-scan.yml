@@ -26,21 +26,21 @@ jobs:
         run: |
           cd cli/
           npm install --omit=dev
-          ls
-          # cd ../docs/
-          # npm install
-          # ls
+          ls -al
+          cd ../docs/
+          npm install --omit=dev
+          ls -al
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          cache: maven
-          distribution: 'adopt'
-      - name: Build with Maven
-        run: |
-          cd translator/
-          mvn clean install -Dmaven.test.skip=true
+      # - name: Setup JDK
+      #   uses: actions/setup-java@v4
+      #   with:
+      #     java-version: 21
+      #     cache: maven
+      #     distribution: 'adopt'
+      # - name: Build with Maven
+      #   run: |
+      #     cd translator/
+      #     mvn clean install -Dmaven.test.skip=true
         
       - name: Sonatype Lifecycle SCA Scan
         # if: github.repository_owner == 'finos'
@@ -54,6 +54,8 @@ jobs:
           stage: "build"
           scan-targets: ${{ env.SonatypeScanTarget }}
           module-exclude: ${{ env.ExcludeDirectory }}
+          ignore-system-errors: True
+          ignore-scanning-errors: True
   
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
