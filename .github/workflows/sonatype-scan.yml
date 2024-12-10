@@ -27,9 +27,9 @@ jobs:
           cd cli/
           npm install --omit=dev
           ls
-          cd ../docs/
-          npm install
-          ls
+          # cd ../docs/
+          # npm install
+          # ls
 
       - name: Setup JDK
         uses: actions/setup-java@v4
