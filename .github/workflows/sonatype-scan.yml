@@ -6,35 +6,32 @@ on:
 
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
-  SonatypeAppId: "architecture-as-code"
-  SonatypeScanTarget: "translator/pom.xml cli/package-lock.json docs/package-lock.json"
+  SonatypeAppId: "aac"
+  # SonatypeScanTarget: "translator/pom.xml cli/package-lock.json docs/package-lock.json"
   ExcludeDirectory: ""
 
 jobs:
-  build:
-    name: Build and Scan Apps
+  sonatype-scan:
+    name: Sonatype Application Scan
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module-folder: ['cli', 'docs', 'translator']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Build projects with NPM 1
-        run: |
-          cd cli/
-          npm install --omit=dev
-          
-      - name: Build projects with NPM 2
-        run: |  
-          cd docs/
-          npm install --omit=dev
+      # - name: Set up Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 20
+      # - name: Build projects with NPM 
+      #   run: |
+      #     cd cli/
+      #     npm install --omit=dev
+      #     cd ../docs/
+      #     npm install --omit=dev
 
-      - name: TESTING
-        run: find . -type f | wc -l
-        
       # - name: Setup JDK
       #   uses: actions/setup-java@v4
       #   with:
@@ -54,12 +51,10 @@ jobs:
           iq-server-url: ${{ env.SonatypeUrl }}
           username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
           password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
-          application-id: ${{ env.SonatypeAppId }}
+          application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
           stage: "build"
-          scan-targets: ${{ env.SonatypeScanTarget }}
+          scan-targets: ${{ matrix.module-folder }}
           module-exclude: ${{ env.ExcludeDirectory }}
-          ignore-system-errors: True
-          ignore-scanning-errors: True
   
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
