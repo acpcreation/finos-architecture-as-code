@@ -1,4 +1,4 @@
-name: Sonatype SCA Scanning for Node.js and Maven
+name: Sonatype SCA Scanning for AaC
 
 on:
   workflow_dispatch:
@@ -38,10 +38,12 @@ jobs:
       #     java-version: 21
       #     cache: maven
       #     distribution: 'adopt'
-      # - name: Build with Maven
-      #   run: |
-      #     cd translator/
-      #     mvn clean install -Dmaven.test.skip=true
+      
+      - name: Build with Maven
+        run: |
+          if: ${{ matrix.module-folder }} == 'translator'
+          mvn clean install -Dmaven.test.skip=true
+          working-directory: ${{ matrix.module-folder }}
         
       - name: Sonatype Lifecycle SCA Scan
         # if: github.repository_owner == 'finos'
