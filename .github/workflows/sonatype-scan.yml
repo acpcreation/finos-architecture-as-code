@@ -41,7 +41,7 @@ jobs:
       
       - name: Build with Maven
         run: |
-          if: ${{ matrix.module-folder }} == 'translator'
+          if: matrix.module-folder == 'translator'
           mvn clean install -Dmaven.test.skip=true
           working-directory: ${{ matrix.module-folder }}
         
