@@ -7,7 +7,7 @@ on:
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
   SonatypeAppId: "architecture-as-code"
-  SonatypeScanTarget: "translator/ cli/ docs/"
+  SonatypeScanTarget: "translator/pom.xml cli/package-lock.json docs/package-lock.json"
   ExcludeDirectory: ""
 
 jobs:
