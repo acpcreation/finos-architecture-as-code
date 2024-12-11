@@ -22,13 +22,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Build projects with NPM
+      - name: Build projects with NPM 1
         run: |
           cd cli/
           npm install --omit=dev
-          cd ../docs/
+          
+      - name: Build projects with NPM 2
+        run: |  
+          cd docs/
           npm install --omit=dev
-
+        
       # - name: Setup JDK
       #   uses: actions/setup-java@v4
       #   with:
