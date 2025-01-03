@@ -3,6 +3,7 @@ name: Sonatype SCA Scanning for AaC
 on:
   workflow_dispatch:
   pull_request_target:
+  push:
 
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
