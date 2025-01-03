@@ -76,7 +76,7 @@ jobs:
           application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}
-          file-excludes: "*.js, *.md"
+          file-excludes: "*.js *.md"
           module-exclude: ${{ env.ExcludeDirectory }}
   
       # - name: Save Sonatype SBOM
