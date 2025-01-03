@@ -8,7 +8,6 @@ on:
 env:
   SonatypeUrl: "https://finos.sonatype.app/platform/"
   SonatypeAppId: "aac"
-  # SonatypeScanTarget: "translator/pom.xml cli/package-lock.json docs/package-lock.json"
   ExcludeDirectory: ""
 
 jobs:
@@ -46,6 +45,18 @@ jobs:
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}
           module-exclude: ${{ env.ExcludeDirectory }}
+      - name: Save Sonatype SBOM
+        if: steps.evaluate.outputs.scan-id && always() 
+        uses: sonatype/actions/fetch-sbom@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
+          scan-id: ${{ steps.evaluate.outputs.scan-id }}
+          sbom-standard: spdx
+          sbom-version: 2.3
+          artifact-name: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}-sonatype-bom
           
         
   scan-javascript:
@@ -53,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module-folder: ['cli'] #, 'docs'
+        module-folder: ['cli', 'docs']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,21 +88,20 @@ jobs:
           application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}/package-lock.json
-          module-exclude: ${{ env.ExcludeDirectory }}
-          # **/*.js 
+          module-exclude: ${{ env.ExcludeDirectory }} 
   
-      # - name: Save Sonatype SBOM
-      #   if: steps.evaluate.outputs.scan-id && always() 
-      #   uses: sonatype/actions/fetch-sbom@v1
-      #   with:
-      #     iq-server-url: ${{ env.SonatypeUrl }}
-      #     username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
-      #     password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
-      #     application-id: ${{ env.SonatypeAppId }}
-      #     scan-id: ${{ steps.evaluate.outputs.scan-id }}
-      #     sbom-standard: spdx
-      #     sbom-version: 2.3
-      #     artifact-name: ${{ env.SonatypeAppId }}-sonatype-bom
+      - name: Save Sonatype SBOM
+        if: steps.evaluate.outputs.scan-id && always() 
+        uses: sonatype/actions/fetch-sbom@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
+          scan-id: ${{ steps.evaluate.outputs.scan-id }}
+          sbom-standard: spdx
+          sbom-version: 2.3
+          artifact-name: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}-sonatype-bom
       
 
         
