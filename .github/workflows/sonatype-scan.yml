@@ -12,40 +12,40 @@ env:
   ExcludeDirectory: ""
 
 jobs:
-  # scan-java:
-  #   name: Build and Scan Java
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       # java-version: [ '21' ]
-  #       module-folder: ['translator']
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - name: Setup JDK
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: 21
-  #         cache: maven
-  #         distribution: 'adopt'
+  scan-java:
+    name: Build and Scan Java
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # java-version: [ '21' ]
+        module-folder: ['translator']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          cache: maven
+          distribution: 'adopt'
       
-  #     - name: Build with Maven
-  #       working-directory: ${{ matrix.module-folder }}
-  #       run: |
-  #         mvn clean install -Dmaven.test.skip=true
+      - name: Build with Maven
+        working-directory: ${{ matrix.module-folder }}
+        run: |
+          mvn clean install -Dmaven.test.skip=true
           
-  #     - name: Sonatype Lifecycle SCA Scan
-  #       # if: github.repository_owner == 'finos'
-  #       id: evaluate
-  #       uses: sonatype/actions/evaluate@v1
-  #       with:
-  #         iq-server-url: ${{ env.SonatypeUrl }}
-  #         username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
-  #         password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
-  #         application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
-  #         stage: "build"
-  #         scan-targets: ${{ matrix.module-folder }}
-  #         module-exclude: ${{ env.ExcludeDirectory }}
+      - name: Sonatype Lifecycle SCA Scan
+        # if: github.repository_owner == 'finos'
+        id: evaluate
+        uses: sonatype/actions/evaluate@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
+          stage: "build"
+          scan-targets: ${{ matrix.module-folder }}
+          module-exclude: ${{ env.ExcludeDirectory }}
           
         
   scan-javascript:
@@ -75,8 +75,8 @@ jobs:
           username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
           password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
           application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
-          stage: 'build -D fileExcludes="*.js *.md *README*"'
-          scan-targets: ${{ matrix.module-folder }}
+          stage: "build"
+          scan-targets: ${{ matrix.module-folder }}/package-lock.json
           module-exclude: ${{ env.ExcludeDirectory }}
           # **/*.js 
   
