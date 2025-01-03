@@ -11,6 +11,7 @@ env:
   ExcludeDirectory: ""
 
 jobs:
+  if: github.repository_owner == 'finos'
   scan-java:
     name: Build and Scan Java
     runs-on: ubuntu-latest
