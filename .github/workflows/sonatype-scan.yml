@@ -75,7 +75,7 @@ jobs:
           username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
           password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
           application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
-          stage: 'build -D fileExcludes="*.js *.md"'
+          stage: 'build -D fileExcludes="*.js *.md *README*"'
           scan-targets: ${{ matrix.module-folder }}
           module-exclude: ${{ env.ExcludeDirectory }}
           # **/*.js 
