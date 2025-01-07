@@ -87,7 +87,7 @@ jobs:
           password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
           application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
           stage: "build"
-          scan-targets: ${{ matrix.module-folder }}/package-lock.json
+          scan-targets: ${{ matrix.module-folder }}/*.json ${{ matrix.module-folder }}/pom.xml
           module-exclude: ${{ env.ExcludeDirectory }} 
   
       - name: Save Sonatype SBOM
