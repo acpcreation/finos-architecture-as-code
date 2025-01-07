@@ -78,9 +78,11 @@ jobs:
       - name: Build with NPM 
         working-directory: ${{ matrix.module-folder }}
         run: |
-          npm install --omit=dev
+          npm i --package-lock-only
 
-      - name: Build with NPM 
+        # npm install --omit=dev
+
+      - name: TEST
         working-directory: ${{ matrix.module-folder }}
         run: |
           ls -al
