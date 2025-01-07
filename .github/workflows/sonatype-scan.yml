@@ -45,7 +45,8 @@ jobs:
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}/target/
           module-exclude: ${{ env.ExcludeDirectory }}
-          # upload-sarif-file: true
+          sarif-file: sonatype-results.sarif
+          upload-sarif-file: true
           
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
@@ -78,6 +79,11 @@ jobs:
         working-directory: ${{ matrix.module-folder }}
         run: |
           npm install --omit=dev
+
+      - name: Build with NPM 
+        working-directory: ${{ matrix.module-folder }}
+        run: |
+          ls -al
           
       - name: Sonatype Lifecycle SCA Scan
         # if: github.repository_owner == 'finos'
