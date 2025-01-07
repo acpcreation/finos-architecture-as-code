@@ -45,7 +45,7 @@ jobs:
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}/target/
           module-exclude: ${{ env.ExcludeDirectory }}
-          upload-sarif-file: true
+          # upload-sarif-file: true
           
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
@@ -91,7 +91,7 @@ jobs:
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}/*.json ${{ matrix.module-folder }}/pom.xml
           module-exclude: ${{ env.ExcludeDirectory }} 
-          upload-sarif-file: true
+          # upload-sarif-file: true
   
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
