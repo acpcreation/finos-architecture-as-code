@@ -11,55 +11,55 @@ env:
   ExcludeDirectory: ""
 
 jobs:
-  # scan-java:
-  #   name: Build and Scan Java
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       # java-version: [ '21' ]
-  #       module-folder: ['translator', 'calm-hub']
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - name: Setup JDK
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: 21
-  #         cache: maven
-  #         distribution: 'adopt'
+  scan-java:
+    name: Build and Scan Java
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # java-version: [ '21' ]
+        module-folder: ['translator', 'calm-hub']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          cache: maven
+          distribution: 'adopt'
       
-  #     - name: Build with Maven
-  #       working-directory: ${{ matrix.module-folder }}
-  #       run: |
-  #         mvn clean install -Dmaven.test.skip=true
+      - name: Build with Maven
+        working-directory: ${{ matrix.module-folder }}
+        run: |
+          mvn clean install -Dmaven.test.skip=true
           
-  #     - name: Sonatype Lifecycle SCA Scan
-  #       # if: github.repository_owner == 'finos'
-  #       id: evaluate
-  #       uses: sonatype/actions/evaluate@v1
-  #       with:
-  #         iq-server-url: ${{ env.SonatypeUrl }}
-  #         username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
-  #         password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
-  #         application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
-  #         stage: "build"
-  #         scan-targets: ${{ matrix.module-folder }}/target/
-  #         module-exclude: ${{ env.ExcludeDirectory }}
-  #         sarif-file: sonatype-results.sarif
-  #         upload-sarif-file: true
+      - name: Sonatype Lifecycle SCA Scan
+        # if: github.repository_owner == 'finos'
+        id: evaluate
+        uses: sonatype/actions/evaluate@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
+          stage: "build"
+          scan-targets: ${{ matrix.module-folder }}/target/
+          module-exclude: ${{ env.ExcludeDirectory }}
+          sarif-file: sonatype-results.sarif
+          upload-sarif-file: true
           
-  #     - name: Save Sonatype SBOM
-  #       if: steps.evaluate.outputs.scan-id && always() 
-  #       uses: sonatype/actions/fetch-sbom@v1
-  #       with:
-  #         iq-server-url: ${{ env.SonatypeUrl }}
-  #         username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
-  #         password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
-  #         application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
-  #         scan-id: ${{ steps.evaluate.outputs.scan-id }}
-  #         sbom-standard: spdx
-  #         sbom-version: 2.3
-  #         artifact-name: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}-sonatype-bom
+      - name: Save Sonatype SBOM
+        if: steps.evaluate.outputs.scan-id && always() 
+        uses: sonatype/actions/fetch-sbom@v1
+        with:
+          iq-server-url: ${{ env.SonatypeUrl }}
+          username: ${{ secrets.SONATYPE_SCANNER_USERNAME }}
+          password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
+          application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
+          scan-id: ${{ steps.evaluate.outputs.scan-id }}
+          sbom-standard: spdx
+          sbom-version: 2.3
+          artifact-name: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}-sonatype-bom
           
         
   scan-javascript:
@@ -78,9 +78,9 @@ jobs:
       - name: Build with NPM 
         working-directory: ${{ matrix.module-folder }}
         run: |
-          echo 'package-lock=true' >> .npmrc
           npm i --package-lock-only
 
+        # echo 'package-lock=true' >> .npmrc
         # npm install --omit=dev
 
       - name: TEST
@@ -100,7 +100,8 @@ jobs:
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}/*.json ${{ matrix.module-folder }}/pom.xml
           module-exclude: ${{ env.ExcludeDirectory }} 
-          # upload-sarif-file: true
+          sarif-file: sonatype-results.sarif
+          upload-sarif-file: true
   
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
