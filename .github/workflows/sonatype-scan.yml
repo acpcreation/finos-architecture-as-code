@@ -43,8 +43,10 @@ jobs:
           password: ${{ secrets.SONATYPE_SCANNER_PASSWORD }}
           application-id: ${{ env.SonatypeAppId }}-${{ matrix.module-folder }}
           stage: "build"
-          scan-targets: ${{ matrix.module-folder }}
+          scan-targets: ${{ matrix.module-folder }}/target/
           module-exclude: ${{ env.ExcludeDirectory }}
+          upload-sarif-file: true
+          
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
         uses: sonatype/actions/fetch-sbom@v1
@@ -89,6 +91,7 @@ jobs:
           stage: "build"
           scan-targets: ${{ matrix.module-folder }}/*.json ${{ matrix.module-folder }}/pom.xml
           module-exclude: ${{ env.ExcludeDirectory }} 
+          upload-sarif-file: true
   
       - name: Save Sonatype SBOM
         if: steps.evaluate.outputs.scan-id && always() 
