@@ -78,6 +78,7 @@ jobs:
       - name: Build with NPM 
         working-directory: ${{ matrix.module-folder }}
         run: |
+          npm config set package-lock true
           npm i --package-lock-only
 
         # npm install --omit=dev
